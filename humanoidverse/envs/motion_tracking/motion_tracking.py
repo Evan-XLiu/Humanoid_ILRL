@@ -30,8 +30,8 @@ import joblib
 class LeggedRobotMotionTracking(LeggedRobotBase):
     def __init__(self, config, device):
         self.init_done = False
-        # self.debug_viz = True
-        self.debug_viz = False
+        self.debug_viz = True
+        # self.debug_viz = False
         
         super().__init__(config, device)
         self._init_motion_lib()
@@ -39,8 +39,8 @@ class LeggedRobotMotionTracking(LeggedRobotBase):
         self._init_tracking_config()
 
         self.init_done = True
-        self.debug_viz = False
-        # self.debug_viz = True
+        # self.debug_viz = False
+        self.debug_viz = True
 
         self._init_save_motion()
 

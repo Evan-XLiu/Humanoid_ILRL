@@ -8,8 +8,8 @@ python humanoidverse/train_agent.py \
     +obs=motion_tracking/deepmimic_a2c_nolinvel_LARGEnoise_history \
     num_envs=4096 \
     project_name=MotionTracking \
-    experiment_name=MotionTracking_walk_level1 \
-    robot.motion.motion_file="humanoidverse/data/motions/g1_29dof_anneal_23dof/TairanTestbed/singles/0-motions_raw_tairantestbed_smpl_video_walk_level1_filter_amass.pkl" \
+    experiment_name=MotionTracking_violin_79_17 \
+    robot.motion.motion_file="humanoidverse/data/motions/g1_29dof_anneal_23dof/AMASS/singles/0-79_17_poses.pkl" \
     rewards.reward_penalty_curriculum=True \
     rewards.reward_penalty_degree=0.00001 \
     env.config.resample_motion_when_training=False \

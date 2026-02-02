@@ -169,21 +169,52 @@ def process_motion(key_names, key_name_to_pkls, cfg):
 
 @hydra.main(version_base=None, config_path="../../humanoidverse/config", config_name="base")
 def main(cfg : DictConfig) -> None:
-    all_pkls = glob.glob("./humanoidverse/data/motions/raw_tairantestbed_smpl/*.npz", recursive=True)
-    hardcode_motion_name_idx = 3
-    key_name_to_pkls = {"0-" + "_".join(data_path.split("/")[hardcode_motion_name_idx:]).replace(".npz", ""): data_path for data_path in all_pkls}
-    key_names = ["0-" + "_".join(data_path.split("/")[hardcode_motion_name_idx:]).replace(".npz", "") for data_path in all_pkls]
+    # motion_file: process a single .npz file (e.g. humanoidverse/data/AMASS/AMASS_Complete/CMU/79/79_17_poses.npz)
+    motion_file = cfg.get("motion_file", None)
+    if motion_file:
+        motion_path = os.path.abspath(motion_file)
+        if not os.path.exists(motion_path):
+            raise FileNotFoundError(f"Motion file not found: {motion_file}")
+        key_name = "0-" + os.path.basename(motion_path).replace(".npz", "")
+        key_name_to_pkls = {key_name: motion_path}
+        key_names = [key_name]
+        output_dir = f"humanoidverse/data/motions/{cfg.robot.motion.humanoid_type}/AMASS/singles"
+    else:
+        # motion_source: "raw_tairantestbed_smpl" (default) or "AMASS/AMASS_Complete"
+        motion_source = cfg.get("motion_source", "raw_tairantestbed_smpl")
+        motion_root = f"humanoidverse/data/motions/{motion_source}"
+        motion_root_abs = os.path.abspath(motion_root)
+        if not os.path.exists(motion_root_abs):
+            # Fallback: try humanoidverse/data/AMASS/AMASS_Complete (alternative AMASS location)
+            if "AMASS" in motion_source:
+                motion_root_abs = os.path.abspath(f"humanoidverse/data/{motion_source}")
+            if not os.path.exists(motion_root_abs):
+                raise FileNotFoundError(
+                    f"Motion source not found: {motion_root}\n"
+                    f"For AMASS: extract under humanoidverse/data/AMASS/AMASS_Complete/ or humanoidverse/data/motions/AMASS/AMASS_Complete/"
+                )
 
-    # Process each motion individually
+        all_pkls = glob.glob(os.path.join(motion_root_abs, "**/*.npz"), recursive=True)
+        if len(all_pkls) == 0:
+            raise FileNotFoundError(f"No .npz files found under {motion_root_abs}")
+
+        key_name_to_pkls = {}
+        for data_path in all_pkls:
+            rel = os.path.relpath(data_path, motion_root_abs)
+            key = "0-" + rel.replace(".npz", "").replace("/", "_").replace("\\", "_")
+            key_name_to_pkls[key] = data_path
+        key_names = list(key_name_to_pkls.keys())
+
+        output_subdir = "AMASS" if "AMASS" in motion_source else "TairanTestbed"
+        output_dir = f"humanoidverse/data/motions/{cfg.robot.motion.humanoid_type}/{output_subdir}/singles"
+    os.makedirs(output_dir, exist_ok=True)
+
     for key_name in key_names:
-        # if key_name not in select_motion_keys_list:
-        #     continue
         current_key_names = [key_name]
         current_data = process_motion(current_key_names, key_name_to_pkls, cfg)
-        
-        if len(current_data) > 0:  # Only save if processing was successful
-            os.makedirs(f"humanoidverse/data/motions/{cfg.robot.motion.humanoid_type}/TairanTestbed/singles", exist_ok=True)
-            dumped_file = f"humanoidverse/data/motions/{cfg.robot.motion.humanoid_type}/TairanTestbed/singles/{key_name}.pkl"
+
+        if len(current_data) > 0:
+            dumped_file = os.path.join(output_dir, f"{key_name}.pkl")
             logger.info(colored(f"Dumping to {dumped_file}", "green"))
             joblib.dump(current_data, dumped_file)
 

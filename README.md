@@ -424,9 +424,17 @@ If you want to visualize the shape, you can run with flag `+vis=True`, then you 
 
 ## 5. Humanoid-SMPL motion retargeting
 Run the following command to retarget the motion to the humanoid.
+
+By default, the script processes motions from `raw_tairantestbed_smpl` (Tairan Testbed dataset):
 ```bash
 python scripts/data_process/fit_smpl_motion.py +robot=g1/g1_29dof_anneal_23dof
 ```
+
+To retarget motions from **AMASS_Complete** (after extracting AMASS under `humanoidverse/data/motions/AMASS/AMASS_Complete/`):
+```bash
+python scripts/data_process/fit_smpl_motion.py +robot=g1/g1_29dof_anneal_23dof +motion_source=AMASS/AMASS_Complete
+```
+Output will be saved to `humanoidverse/data/motions/{robot_type}/AMASS/singles/`.
 
 ### Visualize motion
 Run
