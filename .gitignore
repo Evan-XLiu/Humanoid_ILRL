@@ -40,8 +40,20 @@ wandb/
 *.egg-info
 __pycache__
 
-humanoidverse/data/motions
+# Motions: ignore most, but allow retargeted singles to be committed
+humanoidverse/data/motions/*
+!humanoidverse/data/motions/g1_29dof_anneal_23dof/
+humanoidverse/data/motions/g1_29dof_anneal_23dof/*
+!humanoidverse/data/motions/g1_29dof_anneal_23dof/AMASS/
+!humanoidverse/data/motions/g1_29dof_anneal_23dof/TairanTestbed/
+humanoidverse/data/motions/g1_29dof_anneal_23dof/AMASS/*
+!humanoidverse/data/motions/g1_29dof_anneal_23dof/AMASS/singles/
+humanoidverse/data/motions/g1_29dof_anneal_23dof/TairanTestbed/*
+!humanoidverse/data/motions/g1_29dof_anneal_23dof/TairanTestbed/singles/
+
 *.pkl
+!humanoidverse/data/motions/g1_29dof_anneal_23dof/AMASS/singles/*.pkl
+!humanoidverse/data/motions/g1_29dof_anneal_23dof/TairanTestbed/singles/*.pkl
 *.pt
 
 *.TXT
